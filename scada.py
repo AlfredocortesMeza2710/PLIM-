@@ -120,7 +120,24 @@ textos = {
     "millones": {
     "Español": "Millones USD",
     "English": "Millions USD"
-},
+    },
+    "orden": {
+    "Español": "Orden",
+    "English": "Order"
+    },
+    "estado_label": {
+    "Español": "Estado",
+    "English": "Status"
+    },
+    "eliminar_titulo": {
+    "Español": "Eliminar Orden",
+    "English": "Delete Order"
+    },
+    "carga_trabajo": {
+    "Español": "Carga de Trabajo por Día",
+    "English": "Daily Workload"
+
+    },
 }
 # ---------------------------------
 # ESTADOS TRADUCIDOS
@@ -180,13 +197,13 @@ mes = st.sidebar.selectbox(
 # -------------------------------------------------
 st.subheader(textos["agregar"][st.session_state.idioma])
 
-orden = st.text_input("Orden", key="add_orden")
+orden = st.text_input(textos["orden"][idioma], key="add_orden")
 secciones = st.number_input("Secciones", min_value=1, key="add_sec")
 lgi = st.date_input("LGI", key="add_lgi")
 fecha_embarque = None
 
 estado = st.selectbox(
-    "Estado",
+    textos["estado_label"][idioma],
     ["Pre-embarque","Pruebas","Línea","Liberado"],
     key="add_estado"
 )
@@ -267,7 +284,7 @@ if not df_total.empty:
 # -------------------------------------------------
 # ELIMINAR
 # -------------------------------------------------
-st.subheader("Eliminar Orden")
+st.subheader(textos["eliminar_titulo"][idioma])
 
 if not df_total.empty:
 
@@ -431,7 +448,7 @@ else:
 # -------------------------------------------------
 # GRAFICA
 # -------------------------------------------------
-st.subheader("Carga de Trabajo por Día")
+st.subheader(textos["carga_trabajo"][idioma])
 
 if not df.empty:
 
