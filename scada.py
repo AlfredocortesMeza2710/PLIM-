@@ -452,14 +452,27 @@ def colorear(row):
         "Liberado": "green",
         "Vencido": "red"
     }
-    color = colores.get(row["Estado_original"], "white")
+    
+    estado_real = row.get("Estado", "")
+    
+    # IMPORTANTE: traducir de regreso si está en inglés
+    estados_reverse = {
+        "Pre-shipping": "Pre-embarque",
+        "Testing": "Pruebas",
+        "Production": "Línea",
+        "Released": "Liberado",
+        "Late": "Vencido"
+    }
+
+    estado_real = estados_reverse.get(estado_real, estado_real)
+
+    color = colores.get(estado_real, "white")
     return [f"background-color: {color}; color: white"] * len(row)
 
 if not df.empty:
 
     df_mostrar = df.copy()
     df_mostrar = df_mostrar.drop(columns=["Fecha_Embarque"], errors="ignore")
-    df_mostrar["Estado_original"] = df_mostrar["Estado"]
     # FORMATO DE FECHAS
     df_mostrar["LGI"] = pd.to_datetime(df_mostrar["LGI"], errors="coerce").dt.strftime("%d-%m-%Y")
     df_mostrar["Fecha_Liberado"] = pd.to_datetime(df_mostrar["Fecha_Liberado"], errors="coerce").dt.strftime("%d-%m-%Y")
@@ -468,8 +481,8 @@ if not df.empty:
     #  CREAR COLUMNA TRADUCIDA (SIN TOCAR LA ORIGINAL)
     df_mostrar["Estado"] = df_mostrar["Estado"].map(
         lambda x: estados.get(x, {}).get(st.session_state.idioma, x)
-)
-    df_mostrar = df_mostrar.drop(columns=["Estado_original"])
+    )
+   
 
     # MOSTRAR
     st.dataframe(df_mostrar.style.apply(colorear, axis=1))
