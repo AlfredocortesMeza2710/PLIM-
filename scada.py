@@ -386,7 +386,7 @@ if not df.empty:
     ventas = df[df["Estado"] == "Liberado"]["KUSD"].sum() / 1000
 
     st.subheader(textos["servicio"][idioma])
-    st.metric(textos["Cumplimiento"][idioma], f"{servicio:.2f}%")
+    st.metric(textos["cumplimiento"][idioma], f"{servicio:.2f}%")
 
     st.subheader(textos["ventas"][idioma])
     st.metric(textos["millones"][idioma], f"${ventas:.2f} M")
