@@ -58,28 +58,25 @@ textos = {
         "English": "PDF Report"
     },
     "filtro": {
-    "Español": "Filtro",
-    "English": "Filter"
+        "Español": "Filtro",
+        "English": "Filter"
     },
     "mes": {
-    "Español": "Seleccionar Mes",
-    "English": "Select Month"
+        "Español": "Seleccionar Mes",
+        "English": "Select Month"
     },
     "fecha_liberacion": {
-    "Español": "Fecha de Liberación",
-    "English": "Release Date"
-    },
-    "fecha_liberacion": {
-    "Español": "Fecha de Liberación",
-    "English": "Release Date"
+        "Español": "Fecha de Liberación",
+        "English": "Release Date"
+    
     },
     "btn_eliminar": {
-    "Español": "Eliminar Orden",
-    "English": "Delete Order"
+        "Español": "Eliminar Orden",
+        "English": "Delete Order"
     },
     "servicio": {
-    "Español": "Servicio al Cliente",
-    "English": "Customer Service"
+        "Español": "Servicio al Cliente",
+        "English": "Customer Service"
     },
     "cumplimiento": {
     "Español": "Cumplimiento",
@@ -136,9 +133,37 @@ textos = {
     "carga_trabajo": {
     "Español": "Carga de Trabajo por Día",
     "English": "Daily Workload"
-
     },
+    "secciones": {
+    "Español": "Secciones",
+    "English": "Sections"
+    },
+    "error_orden": {
+    "Español": "Debes ingresar una orden",
+    "English": "You must enter an order"
+    },
+    "orden_agregada": {
+    "Español": "Orden agregada",
+    "English": "Order added"
+    },
+    "orden_existe": {
+    "Español": "La orden ya existe",
+    "English": "Order already exists"
+    },
+    "eliminada": {
+    "Español": "Eliminada",
+    "English": "Deleted"
+    },
+    "sin_ordenes": {
+    "Español": "No hay órdenes para este mes",
+    "English": "No orders for this month"
+    },
+    "titulo_pdf": {
+    "Español": "Reporte Pre-Embarque",
+    "English": "Pre-shipping Report"
 }
+}
+
 # ---------------------------------
 # ESTADOS TRADUCIDOS
 # ---------------------------------
@@ -198,7 +223,7 @@ mes = st.sidebar.selectbox(
 st.subheader(textos["agregar"][st.session_state.idioma])
 
 orden = st.text_input(textos["orden"][idioma], key="add_orden")
-secciones = st.number_input("Secciones", min_value=1, key="add_sec")
+secciones = st.number_input(textos["secciones"][idioma], min_value=1, key="add_sec")
 lgi = st.date_input("LGI", key="add_lgi")
 fecha_embarque = None
 
@@ -208,9 +233,13 @@ estado = st.selectbox(
     key="add_estado"
 )
 
-kusd = st.number_input("KUSD", key="add_kusd")
+kusd_input = st.text_input("KUSD", key="add_kusd")
 
-if st.button("Agregar Orden", key="btn_add"):
+try:
+        kusd = float(kusd_input.replace(",", ""))
+except:
+        kusd = 0
+if st.button(textos["agregar"][idioma], key="btn_add"):
 
     if orden == "":
         st.error("Debes ingresar una orden")
@@ -246,8 +275,7 @@ if not df_total.empty:
         key="edit_lgi"
     )
 
-    nuevo_estado = st.selectbox(
-        "Estado",
+    nuevo_estado = st.selectbox(textos["estado_label"][idioma],
         ["Pre-embarque","Pruebas","Línea","Liberado"],
         index=["Pre-embarque","Pruebas","Línea","Liberado"].index(fila["Estado"]),
         key="edit_estado"
@@ -278,7 +306,7 @@ if not df_total.empty:
         ))
 
         conn.commit()
-        st.success("Actualizada")
+        st.success(textos["actualizada"][idioma])
         st.rerun()
 
 # -------------------------------------------------
@@ -357,8 +385,8 @@ if not df.empty:
 
     ventas = df[df["Estado"] == "Liberado"]["KUSD"].sum() / 1000
 
-    st.subheader("Servicio al Cliente")
-    st.metric("Cumplimiento", f"{servicio:.2f}%")
+    st.subheader(textos["servicio"][idioma])
+    st.metric(textos["Cumplimiento"][idioma], f"{servicio:.2f}%")
 
     st.subheader(textos["ventas"][idioma])
     st.metric(textos["millones"][idioma], f"${ventas:.2f} M")
@@ -382,7 +410,7 @@ if not df.empty:
         # LIMPIEZA
         df_reporte = df.drop(columns=["Fecha_Embarque"], errors="ignore").copy()
 
-        # FORMATO DE FECHAS (AQUÍ ESTABA EL PROBLEMA)
+        # FORMATO DE FECHAS 
         for col in ["LGI", "Fecha_Liberado"]:
             if col in df_reporte.columns:
                 df_reporte[col] = pd.to_datetime(df_reporte[col], errors="coerce").dt.strftime("%d-%m-%Y")
@@ -435,11 +463,14 @@ if not df.empty:
     # FORMATO DE FECHAS
     df_mostrar["LGI"] = pd.to_datetime(df_mostrar["LGI"], errors="coerce").dt.strftime("%d-%m-%Y")
     df_mostrar["Fecha_Liberado"] = pd.to_datetime(df_mostrar["Fecha_Liberado"], errors="coerce").dt.strftime("%d-%m-%Y")
-
+    # FORMATO KUSD 
+    df_mostrar["KUSD"] = df_mostrar["KUSD"].apply(lambda x: f"{x:,.2f}")
     #  CREAR COLUMNA TRADUCIDA (SIN TOCAR LA ORIGINAL)
     df_mostrar["Estado"] = df_mostrar["Estado"].map(
-    lambda x: estados.get(x, {}).get(st.session_state.idioma, x)
+        lambda x: estados.get(x, {}).get(st.session_state.idioma, x)
 )
+    df_mostrar = df_mostrar.drop(columns=["Estado_original"])
+
     # MOSTRAR
     st.dataframe(df_mostrar.style.apply(colorear, axis=1))
 
