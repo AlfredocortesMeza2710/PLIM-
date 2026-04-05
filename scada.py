@@ -143,25 +143,45 @@ textos = {
     "English": "You must enter an order"
     },
     "orden_agregada": {
-    "Español": "Orden agregada",
-    "English": "Order added"
+        "Español": "Orden agregada",
+        "English": "Order added"
     },
     "orden_existe": {
-    "Español": "La orden ya existe",
-    "English": "Order already exists"
+        "Español": "La orden ya existe",
+        "English": "Order already exists"
     },
     "eliminada": {
-    "Español": "Eliminada",
-    "English": "Deleted"
+        "Español": "Eliminada",
+        "English": "Deleted"
     },
     "sin_ordenes": {
-    "Español": "No hay órdenes para este mes",
-    "English": "No orders for this month"
+        "Español": "No hay órdenes para este mes",
+        "English": "No orders for this month"
     },
     "titulo_pdf": {
-    "Español": "Reporte Pre-Embarque",
-    "English": "Pre-shipping Report"
-}
+        "Español": "Reporte Pre-Embarque",
+        "English": "Pre-shipping Report"
+    },
+    "actualizada": {
+        "Español": "Orden actualizada",
+        "English": "Order updated"
+    },
+    "agregada": {
+        "Español": "Orden agregada",
+        "English": "Order added"
+    },
+    "eliminada": {
+        "Español": "Orden eliminada",
+        "English": "Order deleted"
+    },
+    "error_orden": {
+        "Español": "La orden ya existe",
+        "English": "Order already exists"
+    },
+    "error_vacio": {
+        "Español": "Debes ingresar una orden",
+        "English": "You must enter an order"
+},
 }
 
 # ---------------------------------
