@@ -257,9 +257,10 @@ kusd_input = st.text_input("KUSD", key="add_kusd")
 
 try:
         kusd = float(kusd_input.replace(",", ""))
-        st.warning("KUSD inválido, se asignó 0")
 except:
         kusd = 0
+        if kusd_input != "":
+            st.warning("KUSD inválido, se asignó 0")
         
 if st.button(textos["agregar"][idioma], key="btn_add"):
 
