@@ -257,8 +257,10 @@ kusd_input = st.text_input("KUSD", key="add_kusd")
 
 try:
         kusd = float(kusd_input.replace(",", ""))
+        st.warning("KUSD inválido, se asignó 0")
 except:
         kusd = 0
+        
 if st.button(textos["agregar"][idioma], key="btn_add"):
 
     if orden == "":
@@ -291,7 +293,7 @@ if not df_total.empty:
 
     nuevo_lgi = st.date_input(
         "LGI",
-        value=pd.to_datetime(fila["LGI"]),
+        value=pd.to_datetime(fila["LGI"]) if pd.notnull(fila["LGI"]) else datetime.today(),
         key="edit_lgi"
     )
 
@@ -443,9 +445,11 @@ if not df.empty:
 
         tabla = Table(data)
         tabla.setStyle(TableStyle([
-            ("BACKGROUND", (0,0), (-1,0), colors.grey),
+            ("BACKGROUND", (0,0), (-1,0), colors.black),
             ("TEXTCOLOR",(0,0),(-1,0),colors.white),
-            ("GRID", (0,0), (-1,-1), 1, colors.black)
+            ("ALIGN",(0,0),(-1,-1),"CENTER"),
+            ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+            ("GRID", (0,0), (-1,-1), 0.5, colors.grey)
         ]))
 
         elementos.append(tabla)
