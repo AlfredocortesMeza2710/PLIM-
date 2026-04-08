@@ -418,52 +418,92 @@ if not df.empty:
 # PDF 
 # -------------------------------------------------
 st.subheader(textos["reporte"][st.session_state.idioma])
+# ---------------------------------
+# SELECCIÓN DE MESES PARA PDF
+# ---------------------------------
+opcion_pdf = st.radio(
+    "Tipo de reporte",
+    ["Mes actual", "Seleccionar meses"]
+)
 
+meses_lista = {
+    "Enero":1,"Febrero":2,"Marzo":3,"Abril":4,
+    "Mayo":5,"Junio":6,"Julio":7,"Agosto":8,
+    "Septiembre":9,"Octubre":10,"Noviembre":11,"Diciembre":12
+}
+
+if opcion_pdf == "Seleccionar meses":
+    meses_pdf = st.multiselect(
+        "Selecciona los meses",
+        list(meses_lista.keys())
+    )
+
+    if not meses_pdf:
+        st.warning("Selecciona al menos un mes")
+else:
+    meses_pdf = [mes]  # usa el mes del filtro principal
+if opcion_pdf == "Seleccionar meses" and not meses_pdf:
+    st.stop()
 if not df.empty:
 
     if st.button("Generar Reporte PDF", key="btn_pdf"):
+        
+        # FILTRAR DATAFRAME PARA PDF
+        df_pdf = df.copy()
 
-        buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-        styles = getSampleStyleSheet()
+        # Convertir LGI a datetime por seguridad
+        df_pdf["LGI"] = pd.to_datetime(df_pdf["LGI"], errors="coerce")
 
-        elementos = []
-        elementos.append(Paragraph("Reporte Pre-Embarque", styles["Title"]))
+        # Filtrar por meses seleccionados
+        meses_numeros = [meses_lista[m] for m in meses_pdf if m in meses_lista]
 
-        # LIMPIEZA
-        df_reporte = df.drop(columns=["Fecha_Embarque"], errors="ignore").copy()
+        df_pdf = df_pdf[df_pdf["LGI"].dt.month.isin(meses_numeros)]
 
-        # FORMATO DE FECHAS 
-        for col in ["LGI", "Fecha_Liberado"]:
-            if col in df_reporte.columns:
-                df_reporte[col] = pd.to_datetime(df_reporte[col], errors="coerce").dt.strftime("%d-%m-%Y")
+        if df_pdf.empty:
+            st.warning("No hay datos para esos meses")
+        else:
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            styles = getSampleStyleSheet()
 
-        #CONVERTIR TODO A TEXTO
-        df_reporte = df_reporte.astype(str)
+            elementos = []
+            titulo = "Reporte Pre-Embarque - " + ", ".join(meses_pdf)
+            elementos.append(Paragraph(titulo, styles["Title"]))
+            
+            # USAR df_pdf (CORREGIDO)
+            df_reporte = df_pdf.drop(columns=["Fecha_Embarque"], errors="ignore").copy()
 
-        # TABLA
-        data = [df_reporte.columns.tolist()] + df_reporte.values.tolist()
+            # FORMATO DE FECHAS 
+            for col in ["LGI", "Fecha_Liberado"]:
+                if col in df_reporte.columns:
+                    df_reporte[col] = pd.to_datetime(df_reporte[col], errors="coerce").dt.strftime("%d-%m-%Y")
 
-        tabla = Table(data)
-        tabla.setStyle(TableStyle([
-            ("BACKGROUND", (0,0), (-1,0), colors.black),
-            ("TEXTCOLOR",(0,0),(-1,0),colors.white),
-            ("ALIGN",(0,0),(-1,-1),"CENTER"),
-            ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
-            ("GRID", (0,0), (-1,-1), 0.5, colors.grey)
-        ]))
+            # CONVERTIR TODO A TEXTO
+            df_reporte = df_reporte.astype(str)
 
-        elementos.append(tabla)
-        doc.build(elementos)
+            # TABLA
+            data = [df_reporte.columns.tolist()] + df_reporte.values.tolist()
 
-        buffer.seek(0)
+            tabla = Table(data)
+            tabla.setStyle(TableStyle([
+                ("BACKGROUND", (0,0), (-1,0), colors.black),
+                ("TEXTCOLOR",(0,0),(-1,0),colors.white),
+                ("ALIGN",(0,0),(-1,-1),"CENTER"),
+                ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+                ("GRID", (0,0), (-1,-1), 0.5, colors.grey)
+            ]))
 
-        st.download_button(
-            "Descargar PDF",
-            buffer,
-            file_name="reporte_preembarque.pdf",
-            mime="application/pdf"
-        )
+            elementos.append(tabla)
+            doc.build(elementos)
+
+            buffer.seek(0)
+
+            st.download_button(
+                "Descargar PDF",
+                buffer,
+                file_name="reporte_preembarque.pdf",
+                mime="application/pdf"
+            )
 
 # -------------------------------------------------
 # TABLA
