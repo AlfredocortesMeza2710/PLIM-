@@ -282,12 +282,14 @@ if st.button("Generar Reporte PDF", key="btn_pdf"):
     elementos.append(Paragraph("Reporte Pre-Embarque", styles["Title"]))
 
     data = [df_pdf.columns.tolist()] + df_pdf.astype(str).values.tolist()
-    tabla = Table(data)
+    tabla = Table(data, colWidths=[70]*len(data[0]))
 
     tabla.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), colors.black),
         ("TEXTCOLOR",(0,0),(-1,0),colors.white),
         ("GRID", (0,0), (-1,-1), 0.5, colors.grey)
+        ("FONTSIZE", (0,0), (-1,-1), 8),
+        ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
     ]))
 
     elementos.append(tabla)
@@ -310,3 +312,26 @@ if st.button("Generar Reporte PDF", key="btn_pdf"):
         file_name="reporte_preembarque.pdf",
         mime="application/pdf"
     )
+# -------------------------------------------------
+# GRAFICA
+# -------------------------------------------------
+st.subheader(textos["carga_trabajo"][idioma])
+
+df_graf = pd.read_sql_query("SELECT * FROM ordenes", conn)
+
+if not df_graf.empty:
+
+    df_graf["LGI"] = pd.to_datetime(df_graf["LGI"], errors="coerce")
+    df_graf = df_graf.dropna(subset=["LGI"])
+
+    carga = df_graf.groupby("LGI")["Secciones"].sum()
+
+    if carga.empty:
+        st.warning("No hay datos para la gráfica")
+    else:
+        st.bar_chart(carga)
+else:
+    st.warning("No hay datos en la base")
+
+
+
