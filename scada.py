@@ -232,6 +232,28 @@ if not df_total.empty:
 # PDF
 # -------------------------------------------------
 st.subheader(textos["reporte"][idioma])
+opcion_pdf = st.radio(
+    "Tipo de reporte",
+    ["Mes actual", "Seleccionar meses"]
+)
+
+meses_lista = {
+    "Enero":1,"Febrero":2,"Marzo":3,"Abril":4,
+    "Mayo":5,"Junio":6,"Julio":7,"Agosto":8,
+    "Septiembre":9,"Octubre":10,"Noviembre":11,"Diciembre":12
+}
+
+if opcion_pdf == "Seleccionar meses":
+    meses_pdf = st.multiselect(
+        "Selecciona los meses",
+        list(meses_lista.keys())
+    )
+
+    if not meses_pdf:
+        st.warning("Selecciona al menos un mes")
+        st.stop()
+else:
+    meses_pdf = [mes]  # usa el del sidebar
 
 if st.button("Generar Reporte PDF", key="btn_pdf"):
 
