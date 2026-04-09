@@ -287,7 +287,7 @@ if st.button("Generar Reporte PDF", key="btn_pdf"):
     tabla.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), colors.black),
         ("TEXTCOLOR",(0,0),(-1,0),colors.white),
-        ("GRID", (0,0), (-1,-1), 0.5, colors.grey)
+        ("GRID", (0,0), (-1,-1), 0.5, colors.grey),
         ("FONTSIZE", (0,0), (-1,-1), 8),
         ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
     ]))
