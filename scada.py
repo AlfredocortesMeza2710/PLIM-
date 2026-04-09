@@ -236,6 +236,21 @@ st.subheader(textos["reporte"][idioma])
 if st.button("Generar Reporte PDF", key="btn_pdf"):
 
     df_pdf = pd.read_sql_query("SELECT * FROM ordenes", conn)
+    #  CONVERTIR FECHA
+    df_pdf["LGI"] = pd.to_datetime(df_pdf["LGI"], errors="coerce")
+
+# LISTA DE MESES
+    meses_lista = {
+        "Enero":1,"Febrero":2,"Marzo":3,"Abril":4,
+        "Mayo":5,"Junio":6,"Julio":7,"Agosto":8,
+        "Septiembre":9,"Octubre":10,"Noviembre":11,"Diciembre":12
+    }
+
+# CONVERTIR MESES SELECCIONADOS A NÚMEROS
+    meses_numeros = [meses_lista[m] for m in meses_pdf if m in meses_lista]
+
+# FILTRAR
+    df_pdf = df_pdf[df_pdf["LGI"].dt.month.isin(meses_numeros)]
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
