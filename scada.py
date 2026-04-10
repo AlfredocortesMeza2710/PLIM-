@@ -123,7 +123,7 @@ st.subheader(textos["agregar"][idioma])
 
 orden = st.text_input(textos["orden"][idioma], key="add_orden")
 secciones = st.number_input(textos["secciones"][idioma], min_value=1, key="add_sec")
-lgi = st.date_input("LGI", key="add_lgi")
+lgi = st.date_input("Shipping Date", key="add_lgi")
 fecha_embarque = None
 
 estado = st.selectbox(
@@ -177,7 +177,7 @@ if not df_total.empty:
     fila = df_total[df_total["Orden"] == orden_editar].iloc[0]
 
     nuevo_lgi = st.date_input(
-        "LGI",
+        "Shipping Date",
         value=pd.to_datetime(fila["LGI"]) if pd.notnull(fila["LGI"]) else datetime.today(),
         key="edit_lgi"
     )
@@ -280,7 +280,7 @@ if st.button("Generar Reporte PDF", key="btn_pdf"):
 
     elementos = []
     elementos.append(Paragraph("Reporte Pre-Embarque", styles["Title"]))
-
+    df_pdf = df_pdf.rename(columns={"LGI": "Shipping Date"})
     data = [df_pdf.columns.tolist()] + df_pdf.astype(str).values.tolist()
     tabla = Table(data, colWidths=[70]*len(data[0]))
 
